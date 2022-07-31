@@ -8,7 +8,7 @@ const app = express()
 var mongoDB = "mongodb://localhost/TTsensor"
 mongoose.connect(mongoDB)
 
-const data_url = "https://naturetalkers.altervista.org/C0210045/ttcloud.txt"
+const data_url = ""
 
 /*const ttPlusSchema = mongoose.model("TTPlus",
     new mongoose.Schema({
