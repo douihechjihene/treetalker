@@ -87,7 +87,7 @@ async function createTTC(tab) {
     })
 
     
-    ttc.insert(ttcloud_array)
+   
     const result = await ttc.save()
     console.log(result);
 
