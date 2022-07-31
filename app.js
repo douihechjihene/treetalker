@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 
 const app = express()
 
-const data_url = "https://naturetalkers.altervista.org/C0210045/ttcloud.txt"
+const data_url = " "
 
 
 function name(url) {
