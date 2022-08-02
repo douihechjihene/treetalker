@@ -1,7 +1,7 @@
 const express = require("express")
 const request = require('request')
 const mongoose = require('mongoose')
-const Data = require("./data")
+
 
 const app = express()
 
@@ -48,39 +48,26 @@ const ttCloudSchema4C = mongoose.model("TTCloud_4C",
         rssi_tt6_ttcloud : String,
         rssi_tt7_ttcloud : String,
         rssi_tt8_ttcloud : String,
-        rssi_tt9_ttcloud : String
+        rssi_tt9_ttcloud : String,
+        rssi_tt11_ttcloud: String,
+        rssi_tt12_ttcloud: String,
+        rssi_tt13_ttcloud: String,
+        rssi_tt14_ttcloud: String,
+        rssi_tt15_ttcloud: String,
+        rssi_tt16_ttcloud: String,
+        rssi_tt17_ttcloud: String,
+        rssi_tt18_ttcloud: String,
+        rssi_tt19_ttcloud: String,
+        rssi_tt20_ttcloud: String,
+        rssi_tt21_ttcloud: String,
     })
 )
 
-function extract_date(tab){
-    let d = ""
-    for(let k=0;k<8;k++){
-        d+= tab[k]
-    }
-    return d
-}
-
-function extract_time(tab){
-    let t=""
-    for(let k=9;k<17;k++){
-        t+= tab[k]
-    }
-    return t
-}
-
-function extract_id(tab){
-    let i=""
-    for(let k=18;k<26;k++){
-        i+= tab[k]
-    }
-    return i
-}
-
-async function createTTC4B(tab) {
+async function createTTC4B(tab,id,t,d) {
     const ttc = ttCloudSchema4B({
-        date: extract_date(tab[0]),
-        time: extract_time(tab[0]),
-        id:extract_id(tab[0]),
+        date: d,
+        time: t,
+        tt_id:id,
         number_records: tab[1],
         device_type:tab[2],
         timeestamp:tab[3],
@@ -101,11 +88,11 @@ async function createTTC4B(tab) {
 }
 
 
-async function createTTC4C(tab) {
+async function createTTC4C(tab,id,t,d) {
     const ttc2 = ttCloudSchema4C({
-        date: extract_date(tab[0]),
-        time: extract_time(tab[0]),
-        id:extract_id(tab[0]),
+        date: d,
+        time: t,
+        tt_id:id,
         number_records: tab[1],
         device_type:tab[2],
         timeestamp:tab[3],
@@ -120,6 +107,21 @@ async function createTTC4C(tab) {
         rssi_tt7_ttcloud : tab[12],
         rssi_tt8_ttcloud : tab[13],
         rssi_tt9_ttcloud : tab[14],
+        rssi_tt10_ttcloud: tab[15],
+        rssi_tt11_ttcloud: tab[16],
+        rssi_tt12_ttcloud: tab[17],
+        rssi_tt13_ttcloud: tab[18],
+        rssi_tt14_ttcloud: tab[19],
+        rssi_tt15_ttcloud: tab[20],
+        rssi_tt16_ttcloud: tab[21],
+        rssi_tt17_ttcloud: tab[22],
+        rssi_tt18_ttcloud: tab[23],
+        rssi_tt19_ttcloud: tab[24],
+        rssi_tt20_ttcloud: tab[25],
+        rssi_tt21_ttcloud: tab[26],
+        not_connected_device1: tab[27],
+        not_connected_device2: tab[28],
+        not_connected_device3: tab[29]
     })
 
     ttc2.save(function(err,ttCloudSchema4C) {
@@ -157,11 +159,11 @@ const ttPlusSchema4D = mongoose.model("TTPlus_4D",
 )
 
 
-async function createTTP4D(tab) {
+async function createTTP4D(tab,id,t,d) {
     const ttp = ttPlusSchema({
-        date: extract_date(tab[0]),
-        time: extract_time(tab[0]),
-        tt_id: extract_id(tab[0]),
+        date: d,
+        time: t,
+        tt_id:id,
         record_number: tab[1],
         device_type: tab[2],
         timestamp: tab[3],
@@ -215,11 +217,11 @@ const ttPlusSchema49 = mongoose.model("TTPlus_49",
 })
 )
 
-async function createTTP49(tab) {
+async function createTTP49(tab,id,t,d) {
     const ttp49 = ttPlusSchema49({
-        date: extract_date(tab[0]),
-        time: extract_time(tab[0]),
-        tt_id: extract_id(tab[0]),
+        date: d,
+        time: t,
+        tt_id:id,
         number_records: tab[1],
         device_type: tab[2],
         timeestamp: tab[3],
@@ -245,11 +247,6 @@ async function createTTP49(tab) {
 }
 
 
-
-
-
-
-
 function name(url) {
     request(url,(error, { body}) => {
         if (error) {
@@ -261,27 +258,52 @@ function name(url) {
         
         console.log('Database updated');
 
-        for(let i=0; i<20; i++){
+        for(let i=0; i<2; i++){
             ch =lines[i].split(";")
-            if(ch[2] == "4B"){   
-                createTTC4B(ch)  
-            } 
-            else if (ch[2] == "4C"){
-                createTTC4C(ch)
+            var k = ch[0].split(",")
+            var id = k[1]
+            var td = k[0].split(" ")
+            var t = td[0]
+            var d =td[1]
+            switch (ch[2]){
+                case "4B":{
+                    createTTC4B(ch,id,t,d)
+                    break
+                }
+                case "4C":{
+                    createTTC4C(ch,id,t,d)
+                    break
+                }
+                case "4D":{
+                    createTTP4D(ch,id,t,d)
+                    break
+                }
+                case "49":{
+                    createTTP49(ch,id,t,d)
+                    break
+                }
             }
-
-            else if (ch[2] == "4D"){
-                createTTP4D(ch)
-            }
-            else if  (ch[2] == "49"){
-                createTTP49(ch)
-            }
-            /*else if((ch[2] == "55") ){
-                createTTS(ch)
-            }*/   
+            
         } 
-    })    
+          
+    })  
+    
 }
+
+
+
+
+/*ttCloudSchema4B.find({ battery_level}, function (err, docs) {
+    if (err){
+        console.log(err);
+    }
+    else{
+        console.log("First function call : ", docs);
+    }
+});*/
+
+
+
 
 
 name(data_url)
